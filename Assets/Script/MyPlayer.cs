@@ -11,7 +11,7 @@ public enum EnumPlayer
     Player2 = 2
 }
 
-public class Player : MonoBehaviourPun, IPunObservable
+public class MyPlayer : MonoBehaviourPun, IPunObservable
 {
     public PlayerData_SO data;
     public GameData_SO gamedata;
@@ -21,7 +21,7 @@ public class Player : MonoBehaviourPun, IPunObservable
     public float torque = 100;
 
     public GameObject explosionFX;
-    Player playerScript;
+    MyPlayer playerScript;
     public GameObject canon;
 
     Rigidbody rb;
@@ -41,10 +41,13 @@ public class Player : MonoBehaviourPun, IPunObservable
 
     float health = 100;
 
+    public List<GameObject> lstPrefabs;
+    public GameObject playerPrefab;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        playerScript = GetComponent<Player>();
+        playerScript = GetComponent<MyPlayer>();
         audioPlayer = GetComponent<AudioSource>();
         view = GetComponent<PhotonView>();
 
@@ -57,6 +60,8 @@ public class Player : MonoBehaviourPun, IPunObservable
         {
             cam.enabled = true;
         }
+
+        playerPrefab = lstPrefabs[view.Owner.ActorNumber - 1];
     }
 
     void Update()

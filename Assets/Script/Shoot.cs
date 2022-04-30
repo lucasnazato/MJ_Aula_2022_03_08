@@ -31,7 +31,7 @@ public class Shoot : MonoBehaviour
         if (Input.GetButtonDown("Fire" + (int)numPlayer))
         {
             GameObject temp = PhotonNetwork.Instantiate(bullet.name, this.gameObject.transform.position, this.gameObject.transform.rotation);
-            temp.GetComponent<Bullet>().player = transform.parent.gameObject.GetComponent<Player>();
+            temp.GetComponent<Bullet>().player = transform.parent.gameObject.GetComponent<MyPlayer>();
 
             audioCannon.PlayOneShot(fire1);
             audioCannon.PlayOneShot(fire2);

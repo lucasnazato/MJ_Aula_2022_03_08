@@ -10,7 +10,7 @@ public class Bullet : MonoBehaviour
     public float Force = 100;
     public GameObject explosionParticle;
 
-    public Player player;
+    public MyPlayer player;
 
     AudioSource audioBullet;
     SphereCollider capCollider;

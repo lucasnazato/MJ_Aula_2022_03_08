@@ -8,8 +8,8 @@ public class GameManager : MonoBehaviour
 {
     public GameData_SO gameData;
     public CamManager hud;
-    public Player player1;
-    public Player player2;
+    public MyPlayer player1;
+    public MyPlayer player2;
 
     public Text txtCountdown;
     public GameObject panel;
