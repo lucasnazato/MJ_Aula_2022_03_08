@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 
 public enum EnumPlayer
 {
@@ -41,8 +42,10 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
 
     float health = 100;
 
-    public List<GameObject> lstPrefabs;
+    public GameObject[] arrayPrefabs;
     public GameObject playerPrefab;
+
+    public TMP_Text txtName;
 
     void Start()
     {
@@ -61,7 +64,12 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
             cam.enabled = true;
         }
 
-        playerPrefab = lstPrefabs[view.Owner.ActorNumber - 1];
+        txtName.text = view.Owner.NickName;
+
+        int playerNumber = view.Owner.ActorNumber - 1;
+
+        playerPrefab.GetComponent<MeshFilter>().mesh = arrayPrefabs[playerNumber].GetComponent<MeshFilter>().sharedMesh;
+        playerPrefab.GetComponent<MeshRenderer>().material = arrayPrefabs[playerNumber].GetComponent<MeshRenderer>().sharedMaterial;
     }
 
     void Update()

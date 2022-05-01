@@ -15,7 +15,7 @@ public class LookAtCamera : MonoBehaviour
 
         if (view.IsMine)
         {
-            txtName.enabled = false;
+            //txtName.enabled = false;
         }
     }
 
