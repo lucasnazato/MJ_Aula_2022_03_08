@@ -2,30 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using Photon.Realtime;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
-
-using Hashtable = ExitGames.Client.Photon.Hashtable;
+using Photon.Realtime;
 
 public class NetworkController : MonoBehaviourPunCallbacks
 {
-    public GameObject player;
-
     [Header("LOGIN")]
     public GameObject pnLogin;
-    public TMP_InputField ifNickname;
+    public TMP_InputField iNickname;
     string nickname;
     public Button btnLogin;
 
     [Header("LOBBY")]
     public GameObject pnLobby;
-    public TMP_InputField ifRoomName;
+    public TMP_InputField iRoomName;
     string roomName;
-    public Button btnEntrarSala;
-    public Button btnCriarSala;
 
+
+    public GameObject player;
     private void Start()
     {
         pnLogin.SetActive(true);
@@ -33,12 +29,14 @@ public class NetworkController : MonoBehaviourPunCallbacks
 
         if (PlayerPrefs.HasKey("user"))
         {
-            ifNickname.text = PlayerPrefs.GetString("user");
+            iNickname.text = PlayerPrefs.GetString("user");
         }
     }
 
-
-    // ================= HELPERS =======================
+    public override void OnConnected()
+    {
+        print("OnConnected");
+    }
     public void Login()
     {
         if (!PhotonNetwork.IsConnected)
@@ -51,34 +49,26 @@ public class NetworkController : MonoBehaviourPunCallbacks
 
     public void JoinRandomRoom()
     {
-        print("######## BUSCAR PARTIDA ########");
+        print("BUSCAR PARTIDA...");
         PhotonNetwork.JoinLobby();
+        pnLobby.SetActive(false);
     }
 
     public void CreateRoom()
     {
-        print("######## CRIAR PARTIDA ########");
         RoomOptions opt = new RoomOptions() { MaxPlayers = 4 };
-        PhotonNetwork.JoinOrCreateRoom(ifRoomName.text, opt, TypedLobby.Default, null);
-    }
-
-
-
-    // ============ PHOTON ==============
-    public override void OnConnected()
-    {
-        print("OnConnected");
+        PhotonNetwork.JoinOrCreateRoom(iRoomName.text, opt, TypedLobby.Default, null);
+        pnLobby.SetActive(false);
     }
 
     public override void OnConnectedToMaster()
     {
-        print("Connected to server");
-        PhotonNetwork.NickName = ifNickname.text;
-
+        //PhotonNetwork.JoinLobby();
+        PhotonNetwork.NickName = iNickname.text;
         pnLogin.SetActive(false);
         pnLobby.SetActive(true);
 
-        PlayerPrefs.SetString("user", ifNickname.text);
+        PlayerPrefs.SetString("user", iNickname.text);
     }
 
     public override void OnJoinedLobby()
@@ -90,35 +80,38 @@ public class NetworkController : MonoBehaviourPunCallbacks
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        print("OnJoinRandomFailed");
-
-        string roomName = "jao_" + Random.Range(0, 99);
-        PhotonNetwork.CreateRoom(roomName);
+        Debug.LogWarning("OnJoinRandomFailed: " + message);
+        RoomOptions opt = new RoomOptions() { MaxPlayers = 4 };
+        PhotonNetwork.CreateRoom("Facens", opt);
     }
 
     public override void OnJoinedRoom()
     {
         print("OnJoinedRoom");
 
+        print("Nome da sala: " + PhotonNetwork.CurrentRoom.Name);
+        print("Players conectados: " + PhotonNetwork.CurrentRoom.PlayerCount);
+
+        //pnLobby.SetActive(false);
         foreach (Player nick in PhotonNetwork.PlayerList)
         {
             print("PlayerList: " + nick.NickName);
         }
 
-        //PhotonNetwork.LoadLevel("SampleScene");
-        pnLobby.SetActive(false);
-        //PhotonNetwork.Instantiate(player.name, Vector2.zero, Quaternion.identity);
+        PhotonNetwork.LoadLevel("DesertTank");
+        //PhotonNetwork.Instantiate(player.name, Vector3.zero, Quaternion.identity);
+
+
         Hashtable myHash = new Hashtable();
         myHash.Add("score", 0);
-        PhotonNetwork.LocalPlayer.SetCustomProperties(myHash, null, null);
 
-        PhotonNetwork.LoadLevel("DesertTank");
+        //PhotonNetwork.LocalPlayer.SetCustomProperties(myHash, null, null);
+
         //CreatePlayer();
     }
 
-    public void CreatePlayer()
+    /*public void CreatePlayer()
     {
         PhotonNetwork.Instantiate(player.name, Vector3.zero, Quaternion.identity);
-    }
+    }*/
 }
-

@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using TMPro;
 
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -26,7 +26,7 @@ public class Network2 : MonoBehaviourPunCallbacks
         print("##################### LOGIN ##################");
         if (!PhotonNetwork.IsConnected)
         {
-            //PhotonNetwork.ConnectUsingSettings();
+            PhotonNetwork.ConnectUsingSettings();
         }
     }
 
@@ -39,7 +39,7 @@ public class Network2 : MonoBehaviourPunCallbacks
         print("Connected to server");
 
         PhotonNetwork.JoinLobby();
-        PhotonNetwork.NickName = "Sanic";
+        PhotonNetwork.NickName = "Matheo";
     }
 
     public override void OnJoinedLobby()
@@ -68,11 +68,15 @@ public class Network2 : MonoBehaviourPunCallbacks
             print("PlayerList: " + nick.NickName);
         }
 
+        //PhotonNetwork.LoadLevel("Elevator");
+        //PhotonNetwork.Instantiate(player.name, Vector3.zero, Quaternion.identity);
+
+
         Hashtable myHash = new Hashtable();
         myHash.Add("score", 0);
+
         PhotonNetwork.LocalPlayer.SetCustomProperties(myHash, null, null);
 
-        //PhotonNetwork.LoadLevel("Elevator");
         CreatePlayer();
     }
 
@@ -81,5 +85,3 @@ public class Network2 : MonoBehaviourPunCallbacks
         PhotonNetwork.Instantiate(player.name, Vector3.zero, Quaternion.identity);
     }
 }
-
-

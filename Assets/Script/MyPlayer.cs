@@ -47,12 +47,25 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
 
     public TMP_Text txtName;
 
+    GameObject[] spawnPoints;
+
+    Network2 netWork;
+
+    public TMP_Text txtScore;
+
+    public MyPlayer enemyPlayer;
+
+    ManagerHUD hud;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         playerScript = GetComponent<MyPlayer>();
         audioPlayer = GetComponent<AudioSource>();
         view = GetComponent<PhotonView>();
+        netWork = FindObjectOfType<Network2>();
+
+        hud = GameObject.FindObjectOfType<ManagerHUD>();
 
         if (!view.IsMine)
         {
@@ -63,6 +76,9 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
         {
             cam.enabled = true;
         }
+
+        spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
+        transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
 
         txtName.text = view.Owner.NickName;
 
@@ -120,6 +136,7 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
         }
     }
 
+    /*
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.CompareTag("Bullet") && !isPlayerDead)
@@ -131,7 +148,7 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
 
             if (health <= 0)
             {
-                GameObject temp = Instantiate(explosionFX, gameObject.transform.position, gameObject.transform.rotation);
+                GameObject temp = Instantiate(explosionFX, gameObject.transform.position, gameObject.transform.rotation, transform);
                 temp.transform.localScale = new Vector3(6, 6, 6);
 
                 audioPlayer.clip = onFire;
@@ -141,12 +158,11 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
                 playerScript.enabled = false;
                 canon.GetComponent<Shoot>().enabled = false;
 
-                collision.gameObject.GetComponent<Bullet>().player.AddPoint(1);
-
                 isPlayerDead = true;
             }
         }
     }
+    
 
     public void AddPoint(int value)
     {
@@ -159,6 +175,7 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
         data.health = value;
         gamedata.onUpdateHUD.Invoke();
     }
+    */
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -171,6 +188,53 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
         {
             transform.position = (Vector3)stream.ReceiveNext();
             transform.rotation = (Quaternion)stream.ReceiveNext();
+        }
+    }
+
+    public void AddScore(int value)
+    {
+        if (view.IsMine)
+        {
+            view.RPC("AddScoreNet", RpcTarget.All, value);
+        }
+    }
+
+    [PunRPC]
+
+    private void AddScoreNet(int value)
+    {
+        int scoreTmp = (int)view.Owner.CustomProperties["score"];
+        scoreTmp += value;
+
+        view.Owner.CustomProperties["score"] = scoreTmp;
+        txtScore.text = view.Owner.CustomProperties["score"].ToString();
+        hud.SetScore(scoreTmp);
+    }
+
+    public void Die()
+    {
+        GameObject temp = Instantiate(explosionFX, gameObject.transform.position, gameObject.transform.rotation, transform);
+        temp.transform.localScale = new Vector3(6, 6, 6);
+
+        audioPlayer.clip = onFire;
+        audioPlayer.Play();
+        audioPlayer.volume = 0.95f;
+
+        playerScript.enabled = false;
+        canon.GetComponent<Shoot>().enabled = false;
+
+        isPlayerDead = true;
+
+        enemyPlayer.AddScore(1);
+
+        Destroy(gameObject, 5);
+    }
+
+    private void OnDestroy()
+    {
+        if (view.IsMine)
+        {
+            netWork.CreatePlayer();
         }
     }
 }

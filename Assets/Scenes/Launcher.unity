@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.574817, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -394,14 +394,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 227dd269c3ec9b547b83752221ed9eb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 6766364422722462455, guid: 78ca8b823dbd939438cba78eec3a5e2a, type: 3}
   pnLogin: {fileID: 1515745079}
-  ifNickname: {fileID: 1515745078}
+  iNickname: {fileID: 1515745078}
   btnLogin: {fileID: 1515745077}
   pnLobby: {fileID: 1515745076}
-  ifRoomName: {fileID: 1515745075}
-  btnEntrarSala: {fileID: 1515745074}
-  btnCriarSala: {fileID: 1515745073}
+  iRoomName: {fileID: 1515745075}
+  player: {fileID: 6766364422722462455, guid: 78ca8b823dbd939438cba78eec3a5e2a, type: 3}
 --- !u!4 &1308609100
 Transform:
   m_ObjectHideFlags: 0
@@ -541,28 +539,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: adb3ec786d78ac9488ce332065b1fbce, type: 3}
---- !u!114 &1515745073 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7636932346897811921, guid: adb3ec786d78ac9488ce332065b1fbce, type: 3}
-  m_PrefabInstance: {fileID: 1515745072}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1515745074 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7636932347419626832, guid: adb3ec786d78ac9488ce332065b1fbce, type: 3}
-  m_PrefabInstance: {fileID: 1515745072}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1515745075 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7636932346048192409, guid: adb3ec786d78ac9488ce332065b1fbce, type: 3}

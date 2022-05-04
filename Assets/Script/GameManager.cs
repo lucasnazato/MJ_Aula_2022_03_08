@@ -62,8 +62,8 @@ public class GameManager : MonoBehaviour
         {
             player1.enabled = true;
             player2.enabled = true;
-            player1.SetHealth(100);
-            player2.SetHealth(100);
+            //player1.SetHealth(100);
+            //player2.SetHealth(100);
             SceneManager.LoadScene("SampleScene");
         }
     }

@@ -27,13 +27,6 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        GameObject temp = PhotonNetwork.Instantiate(explosionParticle.name, this.gameObject.transform.position, this.gameObject.transform.rotation);
-
-        audioBullet.Play();
-        gameObject.GetComponent<Renderer>().enabled = false;
-        capCollider.enabled = false;
-
-        Destroy(temp, 3);
-        Destroy(gameObject, 5);
+        Destroy(gameObject);
     }
 }
