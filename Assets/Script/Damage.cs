@@ -16,8 +16,8 @@ public class Damage : MonoBehaviour
             health.UpdateHealth(-10);
 
             collision.gameObject.GetComponent<MyPlayer>().enemyPlayer = player;
-
-            Destroy(gameObject);
         }
+
+        Destroy(gameObject);
     }
 }

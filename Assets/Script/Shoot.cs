@@ -6,7 +6,6 @@ using Photon.Pun;
 public class Shoot : MonoBehaviour
 {
     public GameObject bullet;
-    public EnumPlayer numPlayer;
 
     public AudioClip fire1;
     public AudioClip fire2;
@@ -16,6 +15,9 @@ public class Shoot : MonoBehaviour
     PhotonView view;
 
     MyPlayer player;
+
+    public float timeToShoot = 1f;
+    float time = 0;
 
     private void Start()
     {
@@ -31,15 +33,25 @@ public class Shoot : MonoBehaviour
             return;
         }
 
-        if (Input.GetButtonDown("Fire" + (int)numPlayer))
+        time += Time.deltaTime;
+
+        if (Input.GetButtonDown("Fire") && time > timeToShoot)
         {
-            GameObject temp = PhotonNetwork.Instantiate(bullet.name, this.gameObject.transform.position, this.gameObject.transform.rotation);
-            temp.GetComponent<Bullet>().player = transform.parent.gameObject.GetComponent<MyPlayer>();
-
-            temp.GetComponent<Damage>().player = player;
-
-            audioCannon.PlayOneShot(fire1);
-            audioCannon.PlayOneShot(fire2);
+            view.RPC("InstatiateBullet", RpcTarget.All);
+            time = 0;
         }
+    }
+
+    [PunRPC]
+
+    private void InstatiateBullet()
+    {
+        GameObject temp = Instantiate(bullet, this.gameObject.transform.position, this.gameObject.transform.rotation);
+        temp.GetComponent<Bullet>().player = transform.parent.gameObject.GetComponent<MyPlayer>();
+
+        temp.GetComponent<Damage>().player = player;
+
+        audioCannon.PlayOneShot(fire1);
+        audioCannon.PlayOneShot(fire2);
     }
 }

@@ -62,19 +62,8 @@ public class Network2 : MonoBehaviourPunCallbacks
         print("Nome da sala: " + PhotonNetwork.CurrentRoom.Name);
         print("Players conectados: " + PhotonNetwork.CurrentRoom.PlayerCount);
 
-        //pnLobby.SetActive(false);
-        foreach (Player nick in PhotonNetwork.PlayerList)
-        {
-            print("PlayerList: " + nick.NickName);
-        }
-
-        //PhotonNetwork.LoadLevel("Elevator");
-        //PhotonNetwork.Instantiate(player.name, Vector3.zero, Quaternion.identity);
-
-
         Hashtable myHash = new Hashtable();
         myHash.Add("score", 0);
-
         PhotonNetwork.LocalPlayer.SetCustomProperties(myHash, null, null);
 
         CreatePlayer();

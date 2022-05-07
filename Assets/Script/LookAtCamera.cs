@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using TMPro;
+using UnityEngine.UI;
 
 public class LookAtCamera : MonoBehaviour
 {
     PhotonView view;
-    public TMP_Text txtName;
+
+    public GameObject EnemyCanvas;
+    public GameObject PlayerCanvas;
 
     private void Start()
     {
@@ -15,7 +18,11 @@ public class LookAtCamera : MonoBehaviour
 
         if (view.IsMine)
         {
-            //txtName.enabled = false;
+            EnemyCanvas.SetActive(false);
+        }
+        else
+        {
+            PlayerCanvas.SetActive(false);
         }
     }
 

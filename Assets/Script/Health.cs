@@ -11,22 +11,20 @@ public class Health : MonoBehaviour
     public float health = 100;
     public float maxHealth = 100;
     public Image imgHealth;
+    public Image imgPlayerHealth;
     MyPlayer player;
-    ManagerHUD hud;
 
     private void Start()
     {
         view = GetComponent<PhotonView>();
         player = GetComponent<MyPlayer>();
-        hud = GameObject.FindObjectOfType<ManagerHUD>();
     }
 
     public void UpdateHealth(float value)
     {
         health += value;
         imgHealth.fillAmount = health / maxHealth;
-
-        hud.SetHealth(health / maxHealth);
+        imgPlayerHealth.fillAmount = health / maxHealth;
 
         if (health <= 0)
         {

@@ -6,28 +6,17 @@ using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 
-public enum EnumPlayer
-{
-    Player1 = 1,
-    Player2 = 2
-}
-
 public class MyPlayer : MonoBehaviourPun, IPunObservable
 {
-    public PlayerData_SO data;
-    public GameData_SO gamedata;
-    public EnumPlayer numPlayer;
-    
     public float force = 100;
     public float torque = 100;
 
     public GameObject explosionFX;
-    MyPlayer playerScript;
     public GameObject canon;
 
     Rigidbody rb;
     AudioSource audioPlayer;
-    PhotonView view;
+    public PhotonView view;
     public Camera cam;
 
     public AudioClip motorIdle;
@@ -40,10 +29,8 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
     bool isPlayerDead = false;
     bool isIdle = true;
 
-    float health = 100;
-
     public GameObject[] arrayPrefabs;
-    public GameObject playerPrefab;
+    public GameObject tankPrefab;
 
     public TMP_Text txtName;
 
@@ -52,20 +39,27 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
     Network2 netWork;
 
     public TMP_Text txtScore;
+    public TMP_Text txtPlayerScore;
 
     public MyPlayer enemyPlayer;
 
-    ManagerHUD hud;
+    bool updatePlayerPrefab = false;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        playerScript = GetComponent<MyPlayer>();
-        audioPlayer = GetComponent<AudioSource>();
+        txtName.text = view.Owner.NickName;
+
         view = GetComponent<PhotonView>();
+        rb = GetComponent<Rigidbody>();
+        audioPlayer = GetComponent<AudioSource>();
         netWork = FindObjectOfType<Network2>();
 
-        hud = GameObject.FindObjectOfType<ManagerHUD>();
+        object tmp;
+        if (view.Owner.CustomProperties.TryGetValue("score", out tmp))
+        {
+            txtScore.text = tmp.ToString();
+            txtPlayerScore.text = tmp.ToString();
+        }
 
         if (!view.IsMine)
         {
@@ -80,16 +74,26 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
         spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
         transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
 
-        txtName.text = view.Owner.NickName;
+        view.RPC("ChangePlayerPrefab", RpcTarget.All);
+    }
 
+    [PunRPC]
+
+    private void ChangePlayerPrefab()
+    {
         int playerNumber = view.Owner.ActorNumber - 1;
-
-        playerPrefab.GetComponent<MeshFilter>().mesh = arrayPrefabs[playerNumber].GetComponent<MeshFilter>().sharedMesh;
-        playerPrefab.GetComponent<MeshRenderer>().material = arrayPrefabs[playerNumber].GetComponent<MeshRenderer>().sharedMaterial;
+        tankPrefab.GetComponent<MeshRenderer>().material = arrayPrefabs[playerNumber].GetComponent<MeshRenderer>().sharedMaterial;
+        tankPrefab.GetComponent<MeshFilter>().mesh = arrayPrefabs[playerNumber].GetComponent<MeshFilter>().sharedMesh;
     }
 
     void Update()
     {
+        if (!updatePlayerPrefab)
+        {
+            view.RPC("ChangePlayerPrefab", RpcTarget.All);
+            updatePlayerPrefab = true;
+        }
+
         if (!view.IsMine)
         {
             return;
@@ -106,76 +110,38 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
             return;
         }
 
-        Vector3 dir = transform.forward * force * ver;
-        rb.velocity =  new Vector3 (dir.x, rb.velocity.y, dir.z);
-
-        float angle = transform.rotation.eulerAngles.y;
-        rb.MoveRotation(Quaternion.Euler(0, angle + (hor * torque), 0));
-
-        rb.AddForce(transform.forward * force * ver);
-
-        if (hor != 0 || ver != 0)
+        if (!isPlayerDead)
         {
-            if (!isIdle)
+            Vector3 dir = transform.forward * force * ver;
+            rb.velocity = new Vector3(dir.x, rb.velocity.y, dir.z);
+
+            float angle = transform.rotation.eulerAngles.y;
+            rb.MoveRotation(Quaternion.Euler(0, angle + (hor * torque), 0));
+
+            rb.AddForce(transform.forward * force * ver);
+
+            if (hor != 0 || ver != 0)
             {
-                audioPlayer.clip = tankMoving;
-                audioPlayer.Play();
-                audioPlayer.volume = 0.6f;
-                isIdle = true;
+                if (!isIdle)
+                {
+                    audioPlayer.clip = tankMoving;
+                    audioPlayer.Play();
+                    audioPlayer.volume = 0.3f;
+                    isIdle = true;
+                }
             }
-        }
-        else if (hor == 0 && ver == 0)
-        {
-            if (isIdle)
+            else if (hor == 0 && ver == 0)
             {
-                audioPlayer.clip = motorIdle;
-                audioPlayer.Play();
-                audioPlayer.volume = 0.2f;
-                isIdle = false;
-            }
-        }
-    }
-
-    /*
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.collider.CompareTag("Bullet") && !isPlayerDead)
-        {
-            health -= 25;
-            health = Mathf.Clamp(health, 0, 100);
-
-            SetHealth(health);
-
-            if (health <= 0)
-            {
-                GameObject temp = Instantiate(explosionFX, gameObject.transform.position, gameObject.transform.rotation, transform);
-                temp.transform.localScale = new Vector3(6, 6, 6);
-
-                audioPlayer.clip = onFire;
-                audioPlayer.Play();
-                audioPlayer.volume = 0.95f;
-
-                playerScript.enabled = false;
-                canon.GetComponent<Shoot>().enabled = false;
-
-                isPlayerDead = true;
+                if (isIdle)
+                {
+                    audioPlayer.clip = motorIdle;
+                    audioPlayer.Play();
+                    audioPlayer.volume = 0.1f;
+                    isIdle = false;
+                }
             }
         }
     }
-    
-
-    public void AddPoint(int value)
-    {
-        data.score += value;
-        gamedata.onUpdateHUD.Invoke();
-    }
-
-    public void SetHealth(float value)
-    {
-        data.health = value;
-        gamedata.onUpdateHUD.Invoke();
-    }
-    */
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -208,7 +174,7 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
 
         view.Owner.CustomProperties["score"] = scoreTmp;
         txtScore.text = view.Owner.CustomProperties["score"].ToString();
-        hud.SetScore(scoreTmp);
+        txtPlayerScore.text = view.Owner.CustomProperties["score"].ToString();
     }
 
     public void Die()
@@ -218,9 +184,8 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
 
         audioPlayer.clip = onFire;
         audioPlayer.Play();
-        audioPlayer.volume = 0.95f;
+        audioPlayer.volume = 0.5f;
 
-        playerScript.enabled = false;
         canon.GetComponent<Shoot>().enabled = false;
 
         isPlayerDead = true;
@@ -232,9 +197,10 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
 
     private void OnDestroy()
     {
-        if (view.IsMine)
+        if (!view.IsMine)
         {
-            netWork.CreatePlayer();
+            return;
         }
+        netWork.CreatePlayer();
     }
 }
